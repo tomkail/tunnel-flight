@@ -16,7 +16,7 @@ The latest round added six readability aids for judging position relative to the
    - Audited Vectagon's tunnel design doc for this project's needs and worked them through with the Vectagon session.
    - Vectagon built `com.tomkail.tunnel` (spline path source, superellipse profiles, wall queries). We consume it as a local UPM package.
    - Vectagon also fixed a bug where the tunnel mesh didn't rebuild when the focus moved backwards (commits c4faab7, 89063c8).
-2. **Project setup.** Unity 6000.5.1f1, URP, macOS, local git.
+2. **Project setup.** Unity 6000.5.1f1, URP, macOS, local git. Since pushed to `git@github.com:tomkail/tunnel-flight.git`.
 3. **Gameplay ahead of the tunnel.** Built the game-side code before the package existed:
    - flight model, heat/boost, wall sensing and response, health
    - camera, feedback, debug HUD
@@ -46,8 +46,11 @@ The latest round added six readability aids for judging position relative to the
      - a cross-section minimap
      - wall speed streaks
      - proximity audio (a generated wind loop) and rumble
+9. **Windows machine, Unity 6.6.** Cloned to `C:\Users\Tom\Projects\tunnel-flight` beside Vectagon and opened in 6000.6.5f1 (the only editor installed there; Vectagon moved to it in 3e324b7). The upgrade bumped URP to 17.6.0, Input System to 1.20.0, Test Framework to 1.8.0, Timeline to 6.6.0 and uGUI to 2.6.0. It compiles; the tests and a feel check haven't been run on 6.6.
 
 ## Waiting on Tom
+
+- Install Unity 6000.6.5f1 on the Mac before pulling the 6.6 upgrade there.
 
 - Feel test of round 3:
   - keyboard ramp
@@ -64,7 +67,7 @@ The latest round added six readability aids for judging position relative to the
 - Wall streaks are subtle by default. Tune `alphaBySpeed` and `brightness` after a feel test.
 - The minimap sits at the bottom right, and Panini bends it slightly at boost. The bottom centre clashes with the floor stripe.
 - Our provider still rebuilds the tunnel mesh itself on respawn. Vectagon has since fixed this in the package, so the workaround can be dropped.
-- The tunnel package lives on Vectagon's `unity6-upgrade` branch, unpushed. Our manifest path resolves to whatever branch Vectagon has checked out.
+- The tunnel package lives on Vectagon's `unity6-upgrade` branch. Our manifest path resolves to Vectagon's working tree, so uncommitted package edits there compile here too (a half-edited `TunnelCap.cs` briefly broke the first import on Windows).
 - Not started: build steps 2+ in `docs/design.md`, and the HUD's form beyond the trial aids.
 
 ## How Claude verifies changes
@@ -76,4 +79,4 @@ Tom's Editor usually has the project open, which blocks batch mode. So Claude ve
 3. Run `FlightSceneSetup.BatchCreate`.
 4. Run `unity test` in PlayMode and EditMode, with `TF_CAPTURE_DIR` set to save game-camera frames.
 
-Last run: PlayMode 6/6, EditMode 20/20.
+Last run: PlayMode 6/6, EditMode 20/20 (on 6000.5.1f1, on the Mac; the steps above are written for macOS).
