@@ -12,15 +12,11 @@ namespace ProjectBootstrap
         static readonly string[] PackagesToAdd =
         {
             "com.unity.splines",
+            // Shared tunnel package, built in Vectagon. Relative to this project's Packages folder.
+            "file:../../vectagon/Packages/com.tomkail.tunnel",
         };
 
-        static readonly string[] PackagesToRemove =
-        {
-            "com.unity.visualscripting",
-            "com.unity.multiplayer.center",
-            "com.unity.collab-proxy",
-            "com.unity.ai.navigation",
-        };
+        static readonly string[] PackagesToRemove = { };
 
         const double TimeoutSeconds = 600;
 

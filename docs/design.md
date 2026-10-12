@@ -21,14 +21,21 @@ A rollercoaster through a twisting tunnel. You can't turn, only roll and pitch. 
 
 ## Flight model
 
+- **[Decided] Keyboard steering ramps.** A held key reaches full deflection over 0.3 s, and releasing it stops at once. Full pitch from keys is 70% of full stick. Sticks are unaffected.
+- **[Decided] Inverted pitch by default.** Stick up is nose down, flight-sim style. It's a toggle in the flight settings.
 - **[Decided] Aircraft model.** Roll rotates the ship around its forward axis. Pitch rotates the heading around the ship's local right axis. To reach the left wall, you roll 90° and pitch.
 - **[Decided] Real heading.** The ship's forward vector can deviate from the tunnel tangent. No auto-alignment or auto-steer.
 - **[Decided] Wide, short ship.** Rolling deliberately lines your wings up with rows of pickups. Collision uses the wingtips, so rolling flat near a wall is a hazard in its own right.
+- **[Decided] Wingtip trails.** Cyan ribbons off each tip mark the ship's widest points and brighten with speed.
+- **[Decided] Manta hull.** A broad crescent planform with a short, scalloped rear and wingtips swept back into points. The span is 3 m, and it's about 1.9 m from nose to tips. The mesh is procedural (`MantaShipMesh`): low-poly, flat-shaded, with glowing tip accents. The collision probes come from the mesh's tips and nose.
 - **[Proposed] Steering authority falls with speed.** Pitch and roll rates are fixed per second, so you get less turn per metre at boost speed. Boosting into a bend becomes a commitment.
 
 ## Camera
 
 - **[Decided] On the spline, behind the player.** The camera sits on the tunnel's centreline spline, a fixed arc length behind the player's spline position. It looks along the spline and rolls with the player. The ship moves around the viewport as it drifts off-centre, so the view itself shows where you are in the cross-section.
+- **[Decided] The ship always stays in frame, by pulling back.** The camera keeps looking along the spline and pulls back along it as far as needed to keep the wingtips and nose inside a circular safe area. That's 80% of the vertical half field of view, and being circular, roll doesn't change the framing. It pulls out fast (0.12 s), eases back in slowly (0.8 s), and stops at 16 m or the bend-radius line-of-sight limit. Only past that does it turn toward the ship. Before the track starts, the camera extends straight back from the first frame. The trade-off is that hugging a wall pulls the camera back and makes the ship smaller on screen.
+- **[Proposed] Camera lift, for feel testing.** A slider (0–3 m, in camera settings and on the debug HUD) raises the chase camera along the ship's up, so the wings are seen from slightly above instead of edge-on. Lift aim (0–1) tilts it back down toward the ship. Lift shrinks near a wall to keep 0.5 m of room. The default is 0, which keeps the centreline camera above; any lift we keep changes that [Decided] item.
+- **[Decided] Toggleable first person.** C or gamepad Select switches to an eye over the front of the canopy, looking along the ship's real heading. Speed FOV, Panini and shake still apply. The hull stays visible by default as a reference.
 - **[Decided] Panini projection.** One of the first things to tune. It keeps the centre rectilinear and compresses the periphery, where the walls are.
 - **[Decided] FOV and distortion scale with speed.** Boosting widens the view and increases Panini strength, so the distortion reads as a speed effect.
 - **[Proposed] Check URP's built-in Panini Projection volume override first** (distance + crop-to-fit). It may be enough when driven from speed. If it can't handle high FOV well, write a custom pass.
@@ -41,7 +48,7 @@ A rollercoaster through a twisting tunnel. You can't turn, only roll and pitch. 
 |---|---|---|
 | Follow distance (arc length) | 2–6 m | Shorter is more visceral and keeps line of sight. Longer is more readable. |
 | Roll follow damping | 0–0.25 s | 0 snaps for maximum vertigo. Some lag adds sway. |
-| FOV at normal / boost max | 90° → 120° | Driven by speed, not by the boost button. |
+| FOV at normal / boost max | 90° → 120° | Driven by speed, not by the boost button. Treated as horizontal FOV by default (a toggle in camera settings); [Open] whether that's the intent. |
 | Panini strength normal / boost | 0.2 → 0.7 | Check ship readability at the screen edges at high strength. |
 | Speed → effect curve | ease-in | Effects should come in mostly above normal max speed. |
 | Camera position blend (spline ↔ ship) | 0–0.3 | Optional. Moves the camera toward the ship for more of a rollercoaster feel. |
@@ -53,6 +60,8 @@ A rollercoaster through a twisting tunnel. You can't turn, only roll and pitch. 
 - **[Decided] Heat is boost fuel.** You can't boost at 0%. Heat is both the threat and the resource.
 - **[Decided] GX-style release.** On release, speed decays exponentially toward normal max (time constant about 1.5–3 s). Drag applies only above normal max, so it feels like coasting, not braking.
 - **[Decided] Forced boost lock.** When heat hits 100%, boost engages and locks until heat reaches 0%. No explosion. The punishment is losing control at a bad moment. Because boost needs fuel, a forced lock also leaves you with nothing to boost with straight afterwards. Watch whether that's too harsh in time attack.
+- **[Decided] Boost is shown on the ship.** A jet from a rear engine pod idles at cruise and roars on boost, in the spirit of F-Zero. It has a white-hot core, a blue plume, a nozzle flare that reads from the chase camera, and a light that throws glow on the walls behind. Sparks ramp up with the square of boost intensity, with a burst when a boost starts. As in F-Zero GX, sparks hit the tunnel wall and skitter along it behind the ship, using the wall query rather than colliders. Flying near a wall puts more sparks on it, which doubles as a proximity cue. Forced boost tints it orange-red.
+- **[Proposed] Minimum heat to start a boost** (default 5%). A held boost runs down to 0%, but starting one needs a little heat, so boost doesn't flicker on and off at empty.
 - **[Proposed] Heat fills faster at higher speed.** The post-boost coast then has a cost, so you can't chain boosts indefinitely.
 
 The fill-to-drain ratio sets how much of each level you're forced to spend boosting. It's the main difficulty dial. Levels should be authored around it: put a drain straight before every twisty section, and make it a little too short.
@@ -80,12 +89,19 @@ heat:     +6 %/s base, −25 %/s while boosting, clamp 0–100
 Every cue below comes from the same wall-distance query used for collision.
 
 - **Ship light.** A point light with tight falloff, so nearby walls flare.
-- **Audio.** A whoosh panned toward the nearest wall, louder and higher-pitched as you close in.
-- **HUD.** A cross-section indicator or wall-hit markers. Exact form is [Open].
+- **Audio.** A whoosh panned toward the nearest wall, louder, higher-pitched and less muffled (low-pass opens) as you close in. A generated wind-noise loop stands in until there's a real clip.
+- **Rumble.** A low rumble builds within 1.5 m of a wall, before contact.
+- **HUD: wall readout [Decided].** A glowing line from the ship's closest probe to the nearest wall, with a vector-drawn distance readout ("1.6m"). It shows within 6 m, coloured cyan to amber to red as the gap closes, and pulses when closing on the wall fast. The rest of the HUD is [Open].
+- **[Proposed] Readability aids, on trial.** Each can be switched on or off from the debug HUD (F1) for A/B tests:
+  - *Cross-section ring.* A white outline of the tunnel profile at the ship, just inside the walls (6 m ahead in first person). The arc facing the nearest wall widens and takes the danger colour.
+  - *Wall reaction.* The grid reacts where the ship is closest: lines take the danger colour and the cells fill with a rippling glow. It starts at 5 m; the spot tightens, brightens and ripples faster as the gap closes. This replaces a projected ship shadow, at Tom's call.
+  - *Cross-section map.* A screen overlay at the bottom right: the profile at the ship, a dimmer profile 40 m ahead (showing coming shape and twist), the ship as a wingtip bar with an up fin, the nearest-wall line and a floor tick. It's aligned to the view by default.
+  - *Wall streaks.* Speed streaks fixed in the world just inside the walls, with length set by speed and brightening near the ship, for parallax close to the walls.
 - **Contact.** Sparks, scrape audio, controller rumble.
 
 ## Tunnel
 
+- **[Proposed] Readability (placeholder visuals).** A grid of 32 lines along the tunnel (every fourth brighter) and rings every 4 m (brighter every 8 m). One orange floor stripe follows the frame's roll, so twist and orientation read. Grid lines fade with distance and brighten around the ship.
 - **[Decided] Mostly non-circular.** A circle is dull. It has no visible twist and gives no orientation reference. Ovals and rounded shapes are the default.
 - **[Decided] Shape changes along the level, and the tunnel twists.** Twist only has a gameplay effect when the profile isn't round.
 - **[Proposed] Superellipse profiles.** `|x/a|^n + |y/b|^n = 1`. Three parameters cover circle, oval, rounded square and diamond. Shape changes interpolate (a, b, n) along the spline. Twist is the frame's roll channel, so θ is measured in the rolled frame.
@@ -120,7 +136,7 @@ Every cue below comes from the same wall-distance query used for collision.
 
 Each step ends with a feel test. If the earlier steps are fun, later systems may not be needed.
 
-1. **Tunnel + fly.** Integrate the `com.tomkail.tunnel` package (blocked until it's built). Author a test level as a spline with superellipse profiles and a roll (twist) channel. Roll and pitch at constant speed, no hazards.
+1. **Tunnel + fly.** Integrate the `com.tomkail.tunnel` package. Author a test level as a spline with superellipse profiles and a roll (twist) channel. *Playable: a 1.4 km spline test level.* Roll and pitch at constant speed, no hazards.
    *Test: is steering through the shape interesting at a fixed speed?*
 2. **Camera.** Spline follow, roll damping, Panini, speed-driven FOV.
    *Test: vertigo versus readability; can you tell where the ship is?*

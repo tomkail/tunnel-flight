@@ -1,0 +1,20 @@
+{
+    "name": "TunnelFlight.Editor",
+    "rootNamespace": "TunnelFlight.Editor",
+    "references": [
+        "TunnelFlight",
+        "Unity.InputSystem",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "TunnelFlight.TunnelAdapter",
+        "Tunnel",
+        "Tunnel.Splines",
+        "Unity.Splines",
+        "Unity.Mathematics"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "autoReferenced": false
+}

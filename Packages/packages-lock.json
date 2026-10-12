@@ -1,5 +1,13 @@
 {
   "dependencies": {
+    "com.tomkail.tunnel": {
+      "version": "file:../../vectagon/Packages/com.tomkail.tunnel",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.unity.modules.physics": "1.0.0"
+      }
+    },
     "com.unity.burst": {
       "version": "1.8.29",
       "depth": 2,

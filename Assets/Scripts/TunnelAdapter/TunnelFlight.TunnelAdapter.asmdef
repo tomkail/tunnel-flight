@@ -1,0 +1,13 @@
+{
+    "name": "TunnelFlight.TunnelAdapter",
+    "rootNamespace": "TunnelFlight",
+    "references": [
+        "TunnelFlight",
+        "Tunnel",
+        "Tunnel.Splines",
+        "Unity.Splines"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "autoReferenced": true
+}

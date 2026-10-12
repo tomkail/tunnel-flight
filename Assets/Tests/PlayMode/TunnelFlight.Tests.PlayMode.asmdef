@@ -1,0 +1,17 @@
+{
+    "name": "TunnelFlight.Tests.PlayMode",
+    "rootNamespace": "TunnelFlight.Tests",
+    "references": [
+        "TunnelFlight",
+        "TunnelFlight.TunnelAdapter",
+        "Tunnel",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "overrideReferences": true,
+    "precompiledReferences": ["nunit.framework.dll"],
+    "autoReferenced": false,
+    "defineConstraints": ["UNITY_INCLUDE_TESTS"]
+}

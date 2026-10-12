@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb92db11d177e4ed19bfa2b113b07599, type: 3}
+  m_Name: TestLevelTunnel
+  m_EditorClassIdentifier: Tunnel::Tunnel.TunnelGeneratorSettings
+  trackKind: 0
+  integrationMode: 1
+  sampleSpacing: 5
+  track:
+    leadingLength: 140
+    trailingMargin: 200
+    generateAllOnRestart: 1
+    projectSearchRadius: 20
+    projectMaxIterations: 16
+    projectTolerance: 0.0001
+    projectStepFraction: 0.5
+    curvatureStepFraction: 0.05
+    bendScanStepFraction: 0.25
+  profile:
+    rid: 8485291034890993664
+  commandStartDistance: 200
+  difficultyOffset: 140
+  rules: []
+  sections:
+    opening: {fileID: 0}
+    repeating: {fileID: 0}
+    repeatEvery: 0
+    sequence: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 8485291034890993664
+      type: {class: SuperellipseProfile, ns: Tunnel, asm: Tunnel}
+      data:
+        widthChannel: a
+        heightChannel: b
+        exponentChannel: n
+        initialA: 7
+        initialB: 7
+        initialN: 2
+        segments: 64
